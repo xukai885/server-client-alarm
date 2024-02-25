@@ -1,0 +1,12 @@
+port: 8081
+webhook:
+  url: "xxx"
+  token: "xxx"
+  to: "xxx@gmail.com" # 收件人
+  title: "xxx" # 通知标题
+db:
+  host: "ip"
+  port: 3306
+  user: "xxx"
+  pass: "xxx"
+  dbname: "xxx"
