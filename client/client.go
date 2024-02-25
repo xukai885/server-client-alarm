@@ -45,23 +45,23 @@ func main() {
 	}
 	// 注册
 	resp, err := sendRequest(fmt.Sprintf("%s/api/register", serverUrt), bodyJson)
+
 	if err != nil {
 		log.Println("注册失败", err)
-		return
+	} else {
+		BodyJson(resp)
 	}
-	BodyJson(resp)
 
 	// 探活
 	for {
 		resp, err := sendRequest(fmt.Sprintf("%s/api/alive", serverUrt), bodyJson)
 		if err != nil {
 			log.Println("注册失败", err)
-			return
+		} else {
+			BodyJson(resp)
 		}
-		BodyJson(resp)
 		time.Sleep(30 * time.Second)
 	}
-
 }
 func BodyJson(r *http.Response) {
 	body, err := ioutil.ReadAll(r.Body)
