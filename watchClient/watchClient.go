@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"server-client-alarm/modules"
+	"server-client-alarm/settings"
 	"server-client-alarm/tosend"
 	"time"
 )
@@ -15,7 +16,8 @@ var noChange map[string]string
 
 func Init() {
 	// 启动定时任务
-	ticker := time.NewTicker(5 * time.Second)
+
+	ticker := time.NewTicker(settings.Conf.Watch.Wait * time.Second)
 	defer ticker.Stop()
 
 	noChange := make(map[string]string)
@@ -47,7 +49,7 @@ func hasTimeChanged(noChange map[string]string) {
 		if ClientListSum[i].Time != lastClientListSum[i].Time {
 			lastClientListSum[i].Time = ClientListSum[i].Time
 			delete(noChange, ClientListSum[i].Id)
-		} else if time.Since(ClientListSum[i].Time) > 1*time.Minute {
+		} else if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute {
 			noChange[ClientListSum[i].Id] = "true"
 		}
 	}

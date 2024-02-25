@@ -4,6 +4,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"
+	"time"
 )
 
 // 全局变量
@@ -13,7 +14,13 @@ type Appconfig struct {
 	Port     int `mapstruceture:"port"`
 	*Webhook `mapstruceture:"webhook"`
 	*Db      `mapstruceture:"db"`
+	*Watch   `mapstruceture:"watch"`
 }
+type Watch struct {
+	Threshold time.Duration `mapstruceture:"threshold"`
+	Wait      time.Duration `mapstruceture:"wait"`
+}
+
 type Webhook struct {
 	Url   string `mapstruceture:"url"`
 	Token string `mapstruceture:"token"`
