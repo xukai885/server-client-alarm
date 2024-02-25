@@ -3,13 +3,14 @@ package tosend
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"server-client-alarm/settings"
 )
 
 // 发送webhook
-func ToWebHook(msg string) {
+func ToWebHook(msg string, title_ string) {
 	webhook_url := settings.Conf.Webhook.Url
 	token := settings.Conf.Webhook.Token
 	// 设置请求体
@@ -18,7 +19,7 @@ func ToWebHook(msg string) {
 		Title   string `json:"title"`
 		To      string `json:"to"`
 	}{Message: msg,
-		Title: settings.Conf.Webhook.Title,
+		Title: fmt.Sprintf("%s%s", title_, settings.Conf.Webhook.Title),
 		To:    settings.Conf.Webhook.To,
 	}
 

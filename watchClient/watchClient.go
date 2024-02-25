@@ -34,7 +34,7 @@ func Init() {
 					for i := range ClientListSum {
 						if ClientListSum[i].Id == id {
 							// 调用webhook
-							tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s掉线了", ClientListSum[i].Ip, ClientListSum[i].Name))
+							tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s掉线了", ClientListSum[i].Ip, ClientListSum[i].Name), "Alarm")
 						}
 					}
 				}
@@ -49,6 +49,7 @@ func hasTimeChanged(noChange map[string]string) {
 		if ClientListSum[i].Time != lastClientListSum[i].Time {
 			lastClientListSum[i].Time = ClientListSum[i].Time
 			delete(noChange, ClientListSum[i].Id)
+			tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s恢复了", ClientListSum[i].Ip, ClientListSum[i].Name), "Recover")
 		} else if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute {
 			noChange[ClientListSum[i].Id] = "true"
 		}
