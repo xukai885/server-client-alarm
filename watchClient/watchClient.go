@@ -48,8 +48,12 @@ func hasTimeChanged(noChange map[string]string) {
 	for i := range ClientListSum {
 		if ClientListSum[i].Time != lastClientListSum[i].Time {
 			lastClientListSum[i].Time = ClientListSum[i].Time
+			old_len := len(noChange)
 			delete(noChange, ClientListSum[i].Id)
-			tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s恢复了", ClientListSum[i].Ip, ClientListSum[i].Name), "Recover")
+			new_len := len(noChange)
+			if new_len < old_len {
+				tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s恢复了", ClientListSum[i].Ip, ClientListSum[i].Name), "Recover")
+			}
 		} else if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute {
 			noChange[ClientListSum[i].Id] = "true"
 		}
