@@ -2,7 +2,6 @@ package watchClient
 
 import (
 	"fmt"
-	"log"
 	"server-client-alarm/modules"
 	"server-client-alarm/settings"
 	"server-client-alarm/tosend"
@@ -12,7 +11,7 @@ import (
 var ClientListSum []*modules.Client
 var lastClientListSum []modules.Client
 
-var noChange map[string]string
+var noChange map[string]int64
 
 func Init() {
 	// 启动定时任务
@@ -20,21 +19,21 @@ func Init() {
 	ticker := time.NewTicker(settings.Conf.Watch.Wait * time.Second)
 	defer ticker.Stop()
 
-	noChange := make(map[string]string)
+	noChange := make(map[string]int64)
 	InitClientListSum()
 	for {
 		select {
 		case <-ticker.C:
-			log.Println("监听中")
 			// 去发送短信
 			hasTimeChanged(noChange)
 			if noChange != nil {
-				for id, _ := range noChange {
-					log.Printf("%s已掉线", id)
-					for i := range ClientListSum {
-						if ClientListSum[i].Id == id {
-							// 调用webhook
-							tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s掉线了", ClientListSum[i].Ip, ClientListSum[i].Name), "Alarm")
+				for id, v := range noChange {
+					if v != 2 {
+						for i := range ClientListSum {
+							if ClientListSum[i].Id == id {
+								noChange[ClientListSum[i].Id] = 2
+								tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s掉线了", ClientListSum[i].Ip, ClientListSum[i].Name), "Alarm")
+							}
 						}
 					}
 				}
@@ -42,8 +41,8 @@ func Init() {
 		}
 	}
 }
-func hasTimeChanged(noChange map[string]string) {
-
+func hasTimeChanged(noChange map[string]int64) {
+outerLoop:
 	// 遍历每个对象，比较 Time 是否有变化
 	for i := range ClientListSum {
 		if ClientListSum[i].Time != lastClientListSum[i].Time {
@@ -54,8 +53,23 @@ func hasTimeChanged(noChange map[string]string) {
 			if new_len < old_len {
 				tosend.ToWebHook(fmt.Sprintf("IP:%s,名字:%s恢复了", ClientListSum[i].Ip, ClientListSum[i].Name), "Recover")
 			}
-		} else if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute {
-			noChange[ClientListSum[i].Id] = "true"
+		} else {
+			if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute {
+				if noChange[ClientListSum[i].Id] == 3 || noChange[ClientListSum[i].Id] == 2 {
+				} else if noChange[ClientListSum[i].Id] == 1 {
+					noChange[ClientListSum[i].Id] = 2
+				} else {
+					noChange[ClientListSum[i].Id] = 1
+					break outerLoop
+				}
+				if time.Since(ClientListSum[i].Time) > settings.Conf.Watch.Threshold*time.Minute && time.Since(ClientListSum[i].Time) <= settings.Conf.Watch.RepeatInterval*time.Minute+settings.Conf.Watch.Threshold*time.Minute {
+					noChange[ClientListSum[i].Id] = 2
+				} else {
+					noChange[ClientListSum[i].Id] = 3
+					ClientListSum[i].Time = time.Now()
+					lastClientListSum[i].Time = ClientListSum[i].Time
+				}
+			}
 		}
 	}
 }

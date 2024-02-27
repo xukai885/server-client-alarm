@@ -17,8 +17,9 @@ type Appconfig struct {
 	*Watch   `mapstruceture:"watch"`
 }
 type Watch struct {
-	Threshold time.Duration `mapstruceture:"threshold"`
-	Wait      time.Duration `mapstruceture:"wait"`
+	Threshold      time.Duration `mapstruceture:"threshold"`
+	Wait           time.Duration `mapstruceture:"wait"`
+	RepeatInterval time.Duration `mapstruceture:"repeatInterval""`
 }
 
 type Webhook struct {

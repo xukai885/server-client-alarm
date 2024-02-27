@@ -1,7 +1,8 @@
 port: 8081
 watch:
-  threshold: 10 # Minute
-  wait: 5 # Second
+  threshold: 5 # Minute 触发告警时间
+  wait: 5 # Second 扫描间隔
+  repeatInterval: 3 # Minute 告警间隔
 webhook:
   url: "xxx"
   token: "xxx"

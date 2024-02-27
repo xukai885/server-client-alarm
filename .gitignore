@@ -1,2 +1,3 @@
-config_local.yaml
+config-local.yaml
 server
+client/client
