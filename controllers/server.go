@@ -56,3 +56,16 @@ func Alive(c *gin.Context) {
 	ResponseError(c)
 
 }
+
+func Delete(c *gin.Context) {
+	var clientBody modules.Client
+	if err := c.ShouldBindJSON(&clientBody); err != nil {
+		ResponseError(c)
+		return
+	}
+	if err := mysql.Delete(clientBody.Id); err != nil {
+		ResponseError(c)
+		return
+	}
+	ResponseSuccess(c, "🏅")
+}

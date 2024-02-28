@@ -14,6 +14,7 @@ func SetUp() *gin.Engine {
 	v1.GET("/health", controllers.Ping)
 	v1.POST("/register", controllers.Register)
 	v1.POST("/alive", controllers.Alive)
+	v1.POST("/delete", controllers.Delete)
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"msg": "404",

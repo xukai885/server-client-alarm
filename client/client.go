@@ -23,10 +23,11 @@ type Client struct {
 func main() {
 	var name string
 	var serverUrt string
+	var del string
 
-	flag.StringVar(&name, "name", "", "监控客户端名字")
-	flag.StringVar(&serverUrt, "url", "", "服务端地址")
-
+	flag.StringVar(&name, "name", "客户端", "监控客户端名字")
+	flag.StringVar(&serverUrt, "url", "0.0.0.0:80", "服务端地址")
+	flag.StringVar(&del, "del", "false", "删除客户端")
 	flag.Parse()
 
 	id, err := machineid.ID()
@@ -43,25 +44,38 @@ func main() {
 		log.Println("解析失败", err)
 		return
 	}
-	// 注册
-	resp, err := sendRequest(fmt.Sprintf("%s/api/register", serverUrt), bodyJson)
 
-	if err != nil {
-		log.Println("注册失败", err)
-	} else {
-		BodyJson(resp)
-	}
+	if del == "true" {
+		// 删除操作
+		resp, err := sendRequest(fmt.Sprintf("%s/api/delete", serverUrt), bodyJson)
+		if err != nil {
+			log.Println("删除失败", err)
+			return
+		} else {
+			BodyJson(resp)
+		}
+	} else if del == "false" {
+		// 注册
+		resp, err := sendRequest(fmt.Sprintf("%s/api/register", serverUrt), bodyJson)
 
-	// 探活
-	for {
-		resp, err := sendRequest(fmt.Sprintf("%s/api/alive", serverUrt), bodyJson)
 		if err != nil {
 			log.Println("注册失败", err)
 		} else {
 			BodyJson(resp)
 		}
-		time.Sleep(30 * time.Second)
+
+		// 探活
+		for {
+			resp, err := sendRequest(fmt.Sprintf("%s/api/alive", serverUrt), bodyJson)
+			if err != nil {
+				log.Println("注册失败", err)
+			} else {
+				BodyJson(resp)
+			}
+			time.Sleep(30 * time.Second)
+		}
 	}
+
 }
 func BodyJson(r *http.Response) {
 	body, err := ioutil.ReadAll(r.Body)

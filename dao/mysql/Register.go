@@ -31,3 +31,13 @@ func ClientInit() (clist []*modules.Client, err error) {
 	}
 	return
 }
+
+func Delete(id string) (err error) {
+	sqlStr := "DELETE FROM register WHERE id =?;"
+	_, err = db.Exec(sqlStr, id)
+	if err != nil {
+		log.Println("删除错误", err)
+		return
+	}
+	return
+}
