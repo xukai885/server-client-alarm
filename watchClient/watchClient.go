@@ -9,7 +9,7 @@ import (
 )
 
 var ClientListSum []*modules.Client
-var lastClientListSum []modules.Client
+var LastClientListSum []modules.Client
 
 var noChange map[string]int64
 
@@ -45,8 +45,8 @@ func hasTimeChanged(noChange map[string]int64) {
 outerLoop:
 	// 遍历每个对象，比较 Time 是否有变化
 	for i := range ClientListSum {
-		if ClientListSum[i].Time != lastClientListSum[i].Time {
-			lastClientListSum[i].Time = ClientListSum[i].Time
+		if ClientListSum[i].Time != LastClientListSum[i].Time {
+			LastClientListSum[i].Time = ClientListSum[i].Time
 			old_len := len(noChange)
 			delete(noChange, ClientListSum[i].Id)
 			new_len := len(noChange)
@@ -67,7 +67,7 @@ outerLoop:
 				} else {
 					noChange[ClientListSum[i].Id] = 3
 					ClientListSum[i].Time = time.Now()
-					lastClientListSum[i].Time = ClientListSum[i].Time
+					LastClientListSum[i].Time = ClientListSum[i].Time
 				}
 			}
 		}
@@ -77,6 +77,6 @@ outerLoop:
 func InitClientListSum() {
 	for i := range ClientListSum {
 		ClientListSum[i].Time = time.Now()
-		lastClientListSum = append(lastClientListSum, *ClientListSum[i])
+		LastClientListSum = append(LastClientListSum, *ClientListSum[i])
 	}
 }

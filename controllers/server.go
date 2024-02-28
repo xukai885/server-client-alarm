@@ -67,5 +67,20 @@ func Delete(c *gin.Context) {
 		ResponseError(c)
 		return
 	}
+
+	// 遍历切片以查找并删除具有指定属性的对象
+	for i := 0; i < len(watchClient.ClientListSum); i++ {
+		if watchClient.ClientListSum[i].Id == clientBody.Id {
+			watchClient.ClientListSum = append(watchClient.ClientListSum[:i], watchClient.ClientListSum[i+1:]...)
+			i-- // 调整循环变量，以考虑已移除的元素
+		}
+	}
+	for i := 0; i < len(watchClient.LastClientListSum); i++ {
+		if watchClient.LastClientListSum[i].Id == clientBody.Id {
+			watchClient.LastClientListSum = append(watchClient.LastClientListSum[:i], watchClient.LastClientListSum[i+1:]...)
+			i-- // 调整循环变量，以考虑已移除的元素
+		}
+	}
+
 	ResponseSuccess(c, "🏅")
 }
